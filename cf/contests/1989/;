@@ -1,0 +1,9 @@
+#include<iostream>
+#include<string>
+#define ll long long
+using namespace std;
+
+void solve(){
+		string a, b;
+		ll ptr = 0;;
+}
