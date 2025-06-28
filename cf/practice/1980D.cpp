@@ -2,40 +2,80 @@
 #define ll long long
 using namespace std;
 
-
-ll mod(ll n, ll k){
-    return ((n % k + k) % k);
-} 
-
 ll gcd(ll a, ll b){
-    if(a == 0) return b; 
-    else return gcd(mod(b, a), a);
+    if(b == 0) return a;
+    else return gcd(b, a % b);
 }
 
-
 void solve(){
-    // have
-    // gcd(a, b) divides a, divides b
-    // gcd(b, c) divides divies b, divides c
-
-    // want 
-    // gcd(a, c) divides a, divides c, largest 
-
-
-    // 1 2 3 4 5 6 7 8
-    // (1, 2)/(2 ,3)/(3, 4)/(4, 5)/(5, 6)/(6, 7)/(7, 8)
-
-    // 1 2 3 4   6 7 8
-    // (1, 2) (2, 3) (3, 4)        (4, 6) (6, 7) (7, 8)
-
-
-
-
     ll n; cin >> n;
-    ll a[n], b[n - 1];
+    ll a[n];
     for(int i = 0; i < n; i++) cin >> a[i];
-    for(int i = 0; i < n - 1; i++) b[i] = gcd(a[i], a[i + 1]);
 
+    ll b[n - 1];
+    for(int i = 0; i < n - 1; i++){
+        b[i] = gcd(a[i], a[i + 1]);
+    }
+
+    ll I = -1;
+    for(int i = 1; i < n - 1; i++){
+        if(b[i - 1] > b[i]){
+            I = i;
+            break;
+        }
+    }
+
+    if(I == -1){
+        cout << "YES\n";
+        return;
+    }
+
+    vector<ll> temp, temp2;
+
+    // b[I - 1] > b[I]
+    // 0 1 2 3 4
+    //  0 1 2 3
+    // so one of a[I - 1], a[I], a[I + 1] are problematic ?
+
+    // awful stuff down here
+    bool works;
+
+    temp.clear();
+    temp2.clear();
+    for(int i = 0; i < n; i++) if(i != I - 1) temp.push_back(a[i]); 
+    for(int i = 1; i < temp.size(); i++) temp2.push_back(gcd(temp[i], temp[i - 1])); 
+    works = true;
+    for(int i = 1; i < temp2.size(); i++) if(temp2[i - 1] > temp2[i]) works = false;
+    if(works){
+        cout << "YES\n";
+        return;
+    }
+
+    temp.clear();
+    temp2.clear();
+    for(int i = 0; i < n; i++) if(i != I) temp.push_back(a[i]); 
+    for(int i = 1; i < temp.size(); i++) temp2.push_back(gcd(temp[i], temp[i - 1])); 
+    works = true;
+    for(int i = 1; i < temp2.size(); i++) if(temp2[i - 1] > temp2[i]) works = false;
+    if(works){
+        cout << "YES\n";
+        return;
+    }
+
+    temp.clear();
+    temp2.clear();
+    for(int i = 0; i < n; i++) if(i != I + 1) temp.push_back(a[i]); 
+    for(int i = 1; i < temp.size(); i++) temp2.push_back(gcd(temp[i], temp[i - 1])); 
+    works = true;
+    for(int i = 1; i < temp2.size(); i++) if(temp2[i - 1] > temp2[i]) works = false;
+    if(works){
+        cout << "YES\n";
+        return;
+    }
+
+
+    cout << "NO\n";
+    return;
 }
 
 int main(){

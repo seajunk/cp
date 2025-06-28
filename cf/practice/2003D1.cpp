@@ -4,114 +4,65 @@ using namespace std;
 
 void solve(){
     ll n, m; cin >> n >> m;
-    vector<vector<ll>> a(n);
-    unordered_map<ll, set<ll>> adj;
-    set<ll> nodes;
-    unordered_set<ll> fast_nodes;
 
-    vector<ll> mexes;
+    vector<vector<ll>> a(n);
+
 
     for(int i = 0; i < n; i++){
         ll l; cin >> l;
+
         for(int j = 0; j < l; j++){
             ll in; cin >> in;
             a[i].push_back(in);
         }
-
-        vector<bool> seen(l + 2, false);
-
-        for(int j = 0; j < l; j++){
-            if(a[i][j] < l + 2) seen[a[i][j]] = true;
-        }
-        ll u, v;
-
-        for(int j = 0; j < l + 2; j++){
-            if(!seen[j]){
-                u = j;
-                seen[j] = true;
-                break;
-            }
-        }
-        for(int j = 0; j < l + 2; j++){
-            if(!seen[j]){
-                v = j;
-                break;
-            }
-        }
-        mexes.push_back(u);
-        nodes.insert(u);
-        nodes.insert(v);
-        fast_nodes.insert(u);
-        fast_nodes.insert(v);
-        adj[u];
-        adj[v].insert(u);
     }
+
 
     /*
-    for(auto pair : adj){
-        cout << pair.first << ": ";
-        for(ll neigh : pair.second) cout << neigh << ' ';
-        cout << '\n';
-    }
+       n <= 10^5
+       sum(l) <= 10^5
+
+       each a[i] can send x to max(second mex of a, x)
+
+       then find the largest second mex = mxmex2 in a.
+
+       then answer is 
+       maxmex2 * (min(m, mxmex2) + 1) + ((mxmex2 + 1) + ... + m)
+       ?
     */
 
+    ll mxmex2 = LLONG_MIN;
+    for(int i = 0; i < n; i++){
+        ll length = a[i].size();
 
-    unordered_map<ll, ll> max_transition;
-    for(ll node : nodes) max_transition[node] = -1;
-
-
-    unordered_map<ll, bool> visited;
-    for(ll node : nodes) visited[node] = false;
-
-    for(auto it = nodes.rbegin(); it != nodes.rend(); it++){
-        ll curr = *it;
-        if(visited[curr]) continue;
-        
-        max_transition[curr] = max(max_transition[curr], curr);
-        visited[curr] = true;
-        queue<ll> bfs;
-        bfs.push(curr);
-
-        while(bfs.size()){
-            ll  front = bfs.front();
-            bfs.pop();
-            for(ll neigh : adj[front]){
-                if(visited[neigh]) continue;
-                visited[neigh] = true;
-                max_transition[neigh] = max(max_transition[neigh], curr);
-                bfs.push(neigh);
+        vector<bool> seen(length + 2, false);
+        for(int j = 0; j < length; j++){
+            if(!(0 <= a[i][j] && a[i][j] <= length + 1)) continue;
+            seen[a[i][j]] = true;
+        }
+        ll mex1 = -1, mex2 = -1;
+        for(int j = 0; j < length + 2; j++){
+            if(!seen[j]){
+                if(mex1 == -1){
+                    mex1 = j;
+                }
+                else{
+                    mex2 = j;
+                    break;
+                }
             }
         }
+        //cout << mex1 << ' ' << mex2 << '\n';
+
+        mxmex2 = max(mxmex2, mex2);
     }
 
+    ll first = mxmex2 * (min(mxmex2, m) + 1);  
+    ll second = max(0ll, (m*(m + 1)/2) - (mxmex2 * (mxmex2 + 1)/2));
+    ll ans = first + second;
 
-
-    ll max_mex = -1;
-    for(ll mex : mexes) max_mex = max(max_mex, max_transition[mex]);
-
-
-
-
-
-    ll ans = 0;
-    for(ll i = 0; i <= m; i++){
-        if(fast_nodes.find(i) == fast_nodes.end()){
-            ans += max(i, max_mex);
-        }
-        else{
-            ans += max(max_transition[i], max_mex);
-        }
-    }
-
+    //cout << first << ' ' << second << '\n';
     cout << ans << '\n';
-
-
-
-
-
-
-
-
 
 
 
@@ -122,3 +73,10 @@ int main(){
     ll t; cin >> t;
     while(t--) solve();
 }
+
+/*
+   each row lets us send any number x to max(x, second mex) 
+   -> then were interested in the largest second mex in the whole array
+   -> then for each 0, 1, ..., m, it gets mapped to max(max second mex, i)
+   -> sum it up
+*/

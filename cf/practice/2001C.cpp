@@ -1,38 +1,50 @@
 #include <bits/stdc++.h>
-#define ll long long
+typedef long long ll;
 using namespace std;
 
 void solve(){
+
     ll n; cin >> n;
-    set<vector<ll>> edges;
-    set<vector<ll>> seen;
-    stack<vector<ll>> dfs;
-    for(int i = n; i >= 2; i--){
-        vector<ll> in = {1, i};
-        dfs.push(in);
+
+
+    vector<vector<ll>> children(n);
+
+
+    for(int i = 2; i <= n; i++){
+        ll a = i, b = 1;
+        while(a != b){
+            cout << "? " << a << ' ' << b << '\n';
+            ll in; cin >> in;
+            if(a == in){
+                children[b - 1].push_back(a - 1);
+            }
+            b = in;
+        }
     }
+
+    /*
+    for(int i = 0; i < n; i++){
+        cout << i + 1 << ": ";
+        for(auto child : children[i]) cout << child + 1 << ' ';
+        cout << '\n';
+    }
+    */
+
+
+    cout << "! ";
+    stack<ll> dfs;
+    dfs.push(0);
     while(dfs.size()){
-        vector<ll> top = dfs.top();
+        ll top = dfs.top();
         dfs.pop();
-        seen.insert(top);
-        seen.insert({top[1], top[0]});
-        cout << "? " << top[0] << ' ' << top[1] << '\n';
-        ll in; cin >> in;
-        if(in == top[0]){
-            edges.insert({top[0], top[1]});
-        }
-        else{
-            if(seen.find({top[0], in}) == seen.end()) dfs.push({top[0], in});
-            if(seen.find({top[1], in}) == seen.end()) dfs.push({top[1], in});
+
+        for(ll child : children[top]){
+            ll u = top + 1, v = child + 1;
+            cout << u << ' ' << v << ' ';
+            dfs.push(child);
         }
     }
-    cout << "!\n";
-    for(vector<ll> e : edges){
-        cout << e[0] << ' ' << e[1] << '\n';
-    }
-
-
-
+    cout << '\n';
 }
 
 int main(){
